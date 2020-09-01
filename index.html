@@ -1,16 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>自動見積もりフォーム</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+        [v-cloak] {
+            opacity: 0;
+        }
+    </style>
 </head>
+
 <body>
     <div id="app">
         <div class="container bg-dark text-white p-5">
             <h2 class="text-center border-bottom border-white pb-3 mb-5">自動見積もりフォーム</h2>
-            <form>
+            <div>
                 <!-- ムービーの種類 -->
                 <div class="form-group row">
                     <label class="col-md-3 col-form-label pt-0">制作したいムービー
@@ -19,40 +27,44 @@
                     <div class="col-md-9">
                         <div class="row">
                             <div class="col-md-5">
-                                <div class="form-check form-check-inline">
-                                    <input type="radio" name="movie_type" value="余興ムービー" checked id="type1" class="form-check-input">
+                            <div class="form-check form-check-inline">
+                                    <input type="radio" name="movie_type" value="余興ムービー" checked id="type1" class="form-check-input" v-model="movieType">
                                     <label for="type1" class="form-check-label">余興ムービー</label>
                                 </div>
                             </div>
                             <div class="col-md-5">
                                 <div class="form-check form-check-inline">
-                                    <input type="radio" name="movie_type" value="サプライズムービー" id="type2" class="form-check-input">
+                                    <input type="radio" name="movie_type" value="サプライズムービー" id="type2" class="form-check-input" v-model="movieType">
                                     <label for="type2" class="form-check-label">サプライズムービー</label>
                                 </div>
                             </div>
                             <div class="col-md-5">
                                 <div class="form-check form-check-inline">
-                                    <input type="radio" name="movie_type" value="生い立ちムービー" id="type3" class="form-check-input">
+                                    <input type="radio" name="movie_type" value="生い立ちムービー" id="type3" class="form-check-input" v-model="movieType">
                                     <label for="type3" class="form-check-label">生い立ちムービー</label>
                                 </div>
                             </div>
                             <div class="col-md-5">
                                 <div class="form-check form-check-inline">
-                                    <input type="radio" name="movie_type" value="オープニングムービー" id="type4" class="form-check-input">
+                                    <input type="radio" name="movie_type" value="オープニングムービー" id="type4" class="form-check-input" v-model="movieType">
                                     <label for="type4" class="form-check-label">オープニングムービー</label>
                                 </div>
+                            </div>
+
+                             
                             </div>
                             
                         </div>
                     </div>
-                </div>
+                
                 <!-- 挙式日 -->
                 <div class="form-group row">
                     <label class="col-md-3 col-form-label pt-0" for="wedding_date">挙式日
                         <span class="badge badge-danger">必須</span>
                     </label>
                     <div class="col-md-9">
-                        <input type="date" id="wedding-date" class="form-control" placeholder="日付をお選びください">
+                        <input type="date" id="wedding-date" class="form-control" placeholder="日付をお選びください"
+                            v-model="wedding_date">
                         <small class="form-text">結婚のお日にちを選択してください</small>
                     </div>
                 </div>
@@ -62,7 +74,8 @@
                         <span class="badge badge-danger">必須</span>
                     </label>
                     <div class="col-md-9">
-                        <input type="date" class="form-control" id="delivery_date" min="2020-08-24" placeholder="日付をお選びください">
+                        <input type="date" class="form-control" id="delivery_date" v-bind:min="tommorow"
+                            placeholder="日付をお選びください" v-model="delivery_date">
                         <small class="form-text">挙式日の１週間前までにDVDが必要な場合が多いため、仕上がり予定日を挙式日の１週間前に設定しております。</small>
                     </div>
                 </div>
@@ -71,7 +84,8 @@
                     <label class="col-md-3 col-form-label pt-0">基本料金（税込み）</label>
                     <div class="col-md-9">
                         <div class="input-group">
-                            <input type="text" class="form-control text-right" id="sum_base" value="32,400" readonly>
+                            <input type="text" class="form-control text-right" id="sum_base"
+                                v-bind:value="taxedBasePrice | number_format" readonly>
                             <div class="input-group-append">
                                 <label class="input-group-text">円</label>
                             </div>
@@ -80,36 +94,41 @@
                 </div>
                 <!-- オプションメニュー -->
                 <div class="form-group row">
-                    <label class="col-md-3 col-form-label pt-0">オプションメニュー<span class="badge badge-info">任意</span></label>
+                    <label class="col-md-3 col-form-label pt-0">オプションメニュー<span
+                            class="badge badge-info">任意</span></label>
                     <div class="col-md-9">
                         <div class="form-check mb-3">
-                            <input type="checkbox" class="form-check-input" id="opt1">
-                            <label for="opt1" class="form-check-label">BGM手配　＋　5,400円</label>
-                            <small class="form-text">当社で曲を手配させていただく場合は、5,400円（税込み）がかかります。</small>
+                            <input type="checkbox" class="form-check-input" id="opt1" v-model="opt1_use">
+                            <label for="opt1" class="form-check-label">BGM手配　＋　{{taxedOpt1 | number_format}}円</label>
+                            <small class="form-text">当社で曲を手配させていただく場合は、{{taxedOpt1 | number_format}}（税込み）がかかります。</small>
                         </div>
                         <div class="form-check mb-3">
-                            <input type="checkbox" class="form-check-input" id="opt2">
-                            <label for="opt2" class="form-check-label">撮影　＋　5,400円</label>
+                            <input type="checkbox" class="form-check-input" id="opt2" v-model="opt2_use">
+                            <label for="opt2" class="form-check-label">撮影　＋　{{taxedOpt2 | number_format}}円</label>
                             <small class="form-text">当社に撮影を依頼する場合の料金です</small>
                         </div>
                         <div class="form-check mb-3">
-                            <input type="checkbox" class="form-check-input" id="opt3">
-                            <label for="opt3" class="form-check-label">DVD盤面印刷　＋ 5,400円</label>
-                            <small class="form-text">当社でDVDの盤面をデザインさせていただく場合は、5,400円かかります</small>
+                            <input type="checkbox" class="form-check-input" id="opt3" v-model="opt3_use">
+                            <label for="opt3" class="form-check-label">DVD盤面印刷　＋ {{taxedOpt3 | number_format}}円</label>
+                            <small
+                                class="form-text">当社でDVDの盤面をデザインさせていただく場合は、{{taxedOpt3 | number_format}}円かかります</small>
                         </div>
                         <div class="form-row mb-3 align-items-center">
                             <div class="col-auto">
-                                <label for="opt4" class="form-check-label">写真のスキャニング　＋540円</label>
+                                <label for="opt4"
+                                    class="form-check-label">写真のスキャニング　＋{{taxedOpt4 | number_format}}円</label>
                             </div>
                             <div class="col-auto">
                                 <div class="input-group">
-                                    <input type="number" class="form-control" id="opt4" value="0" min="0"　max="30">
+                                    <input type="number" class="form-control" id="opt4" value="0" min="0" 　max="30"
+                                        v-model.number="opt4_num">
                                     <div class="input-group-append">
                                         <label for="opt4" class="input-group-text">枚</label>
                                     </div>
                                 </div>
                             </div>
-                            <small class="form-text">プリントアウトした写真のスキャニングをご希望の方は、１枚あたり540円にていたわります。</small>
+                            <small
+                                class="form-text">プリントアウトした写真のスキャニングをご希望の方は、１枚あたり{{taxedOpt4 | number_format}}円にていたわります。</small>
                         </div>
                     </div>
                 </div>
@@ -118,7 +137,8 @@
                     <label class="col-md-3 col-form-label pt-0">オプション料金（税込み）</label>
                     <div class="col-md-9">
                         <div class="input-group">
-                            <input type="text" class="input form-control text-right" id="sum_opt" value="0" readonly>
+                            <input type="text" class="input form-control text-right" id="sum_opt" value="0"
+                                v-bind:value="taxedOptPrice | number_format" readonly>
                             <div class="input-group-append">
                                 <label class="input-group-text">円</label>
                             </div>
@@ -130,16 +150,20 @@
                     <label class="col-md-3 col-form-label pt-0">合計（税込み）</label>
                     <div class="col-md-9">
                         <div class="input-group">
-                            <input type="text" class="form-control text-right" id="sum_total" value="32,400" readonly>
+                            <input type="text" class="form-control text-right" id="sum_total" value="32,400"
+                                v-bind:value="taxedTotalPrice | number_format" readonly>
                             <div class="input-group-append">
                                 <label class="input-group-text">円</label>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
             </form>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="main.js"></script>
 </body>
+
 </html>
